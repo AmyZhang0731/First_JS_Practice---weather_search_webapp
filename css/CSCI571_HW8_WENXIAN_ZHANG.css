@@ -1,0 +1,340 @@
+body{
+    background-image:  url("bg.jpg");
+    background-repeat: no-repeat;
+    background-attachment:fixed;
+    background-position:center;
+    background-size: cover;
+}
+
+.nav-tabs > li > a{
+    background-color: rgb(238,238,238);
+}
+
+.nav-tabs > li.active > a#mytab, .nav-tabs > li.active > a#mytab:focus, .nav-tabs > li.active > a#mytab:hover{
+    background-color: rgb(34,100,147);
+    color: whitesmoke;
+}
+
+div#api{
+    padding-top: 10px;
+    padding-bottom: 0;
+}
+
+p#header{
+    text-align: center;
+    font-size: 180%;
+    color: rgb(51,51,51);
+    padding-top: 10px;
+}
+
+div.col-md-12{
+    display: flex;
+    Content: "space-between";
+}
+
+div.search{
+    background-color: darkgray;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color:rgba(80,80,80,0.3);
+    border-radius: 0.5em;
+}
+
+div#box{
+    vertical-align:top;
+}
+
+div.form-group#degree{
+    padding-right: 10px;
+}
+
+div#sub{
+    padding-right: 0;
+}
+
+div.line{
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.4;
+}
+
+div#checkbox{
+    padding-top: 15px;
+}
+
+span.first{
+    color: white;
+}
+
+span.star{
+    color: rgb(252,0,3);
+}
+
+form#enter label.error, label.error {
+	color: rgb(190,63,62);
+	font-style: italic;
+    font-size: 80%;
+}
+
+img#image{
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+p#condition{
+    margin-top: 5px;
+    color: rgb(255,255,255);
+    text-align: center;
+    font-size: 15px;
+}
+
+p#num{
+    color: rgb(255,255,255);
+    text-align: center;
+    font-size: 60px;
+    margin-bottom: 0;
+}
+
+span#unit{
+    font-size: 20px;
+    vertical-align:text-top;
+    display: inline-block;
+    padding-top: 8px;
+}
+
+div#left,div#right,div#it,div#table{
+    padding-right: 0;
+    padding-left: 0;
+}
+
+div#left{
+    background-color: rgb(249,124,126);
+}
+
+table#mytable{
+    margin-bottom: 0;
+}
+
+table#mytableh{
+    text-align: center;
+    background-color: rgb(255,255,255);
+    table-layout: fixed;
+}
+
+div#wicon{
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+div.error { display: none; }
+
+form#enter label{
+    display: block;
+}
+
+span#l{
+    color: rgb(27,0,249);
+}
+
+span#h{
+    color: rgb(0,129,28);
+}
+
+p#hl{
+    display: inline-block;
+    margin-bottom: 10px;
+    vertical-align: bottom;
+    padding-top: 10px;
+    font-size: 110%;
+}
+
+p#fb{
+    display: inline-block;
+    vertical-align: bottom;
+    float: right;
+    margin-bottom: 10px;
+}
+
+div#hlfb{
+    text-align: center;
+}
+
+tr.myheader,th#myth{
+    background-color: rgb(34,100,147);
+    color: white;
+    text-align: center;
+}
+
+td#plus{
+    font-size: 120%;
+    color: rgb(34,100,147);
+}
+
+div#collapsediv{
+    overflow: scroll;
+}
+
+tr#insidetr{
+    background-color: rgb(240,240,240);
+}
+
+table#tablein{
+    border: 1px;
+    border-style: solid;
+    border-bottom-color: rgb(221,221,221);
+    border-left-color: rgb(221,221,221);
+    border-right-color: rgb(221,221,221);
+    border-top-color: rgb(221,221,221);
+    position: relative;
+    min-width: 400px;
+}
+
+div#cwell{
+    overflow: scroll;
+}
+
+div#black{
+    background-color: rgb(46,52,57);
+    min-height: 340px; 
+}
+
+div#mymodal{
+    min-height: 380px;
+}
+
+div#modaltext{
+    text-align: center;
+}
+
+span#sumd{
+    color: rgb(255,165,36);
+}
+
+div#weekmd7, #weekmd1, #weekmd2, #weekmd3, #weekmd4, #weekmd5, #weekmd6{
+    border-radius: 6px;
+    margin-right: 5px;
+    margin-top: 5px;
+    margin-top: 5px;
+    text-align: center;
+    color: white;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+div#weekmd1{
+    background-color: rgb(44,125,179);
+}
+div#weekmd2{
+    background-color: rgb(244,63,67);
+}
+div#weekmd3{
+    background-color: rgb(235,141,83);
+}
+div#weekmd4{
+    background-color: rgb(167,165,68);
+}
+div#weekmd5{
+    background-color: rgb(154,111,165);
+}
+div#weekmd6{
+    background-color: rgb(250,122,125);
+}
+div#weekmd7{
+    background-color: rgb(213,65,111);
+}
+
+p#temp{
+    margin-bottom: 0;
+}
+
+p#dtemp{
+    font-size: 200%;  
+    padding-bottom: 10px; 
+}
+
+p#day{
+    font-size: 90%;
+}
+
+#basicMap {
+    width: 100%;
+    height: 99%;
+    min-height: 475px;
+    border: 1px solid black;
+}
+
+#mapdiv{
+    min-height: 475px;
+}
+
+@media screen and (min-width: 1130px){ 
+    div#icon{
+    float:right;
+    }
+}
+    
+@media screen and (min-width: 768px){   
+    div.search{
+        position: relative;
+        width:80%;
+    }
+    div.tabs{
+        position: relative;
+        width:80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    div.line{
+        position: relative;
+        width:80%;
+    }
+    div#black{
+        position: relative;
+        width:100%;
+    }
+    
+td#collapsetd{
+    padding-bottom: 0px;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+}
+
+@media screen and (max-width: 768px){
+    div.search{
+        position: relative;
+        width:95%;
+    }
+    div.tabs{
+        position: relative;
+        width:95%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    div.line{
+        position: relative;
+        width:95%;
+    }
+}
+
+@media screen and (max-width: 991px){
+       div#black{
+        background-color: transparent;
+    }
+    div#weekmd7, #weekmd1, #weekmd2, #weekmd3, #weekmd4, #weekmd5, #weekmd6{
+    border-radius: 30px;
+    }
+    div#mymodal{
+     min-height: 600px;
+        overflow-x: auto;
+}
+    
+}

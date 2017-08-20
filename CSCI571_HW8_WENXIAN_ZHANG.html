@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <link rel="stylesheet" type="text/css" href="css/CSCI571_HW8_WENXIAN_ZHANG.css">
+    <title>Forecast Search</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="js/jquery.js"></script>
+	<script src="js/jquery.validate.js"></script>
+    <script src="http://openlayers.org/api/OpenLayers.js"></script>
+    <script src="http://openweathermap.org/js/OWM.OpenLayers.1.3.4.js"></script>
+    <script>
+        var imgurl;
+        var des;
+        $(document).ready(function(){ 
+            var validator=$("#enter").validate({
+                rules:{
+                    street: "required",
+                    city: "required",
+                    state: "required",
+                },
+                messages:{
+                    street: "please enter the sreet address",
+                    city: "please enter the city",
+                    state: "please select the state",
+                },
+                submitHandler: function(form) {
+                 $.ajax({
+                            url: 'http://amycsci571-env.elasticbeanstalk.com/',
+                            data: $('form').serialize(),
+                            type: 'GET',
+                            success: function(output) {
+                                var json=$.parseJSON(output)
+                                //convert all the data into proper format
+                                //data for the Open Weather Map
+                                           
+                                //data for Right Now tab
+                                var condition=json['currently']['summary']+
+                                    " in "+$("#city")[0].value+", "+$("select option:selected").val();
+                                var temp=Math.ceil(json['currently']['temperature']);
+                                var tempu="° ";
+                                tempu+=($("#enter input[type='radio']:checked").val()=="Fahrenheit")?"F":"C";
+                                var htemp=Math.ceil(json['daily']['data'][0]['temperatureMax'])+"°";
+                                var ltemp=Math.ceil(json['daily']['data'][0]['temperatureMin'])+"°";
+                                var icon=json['currently']['icon'];
+                                var pre=json['currently']['precipIntensity'];
+                                var rain=((json['currently']['precipProbability'])*100).toFixed(0)+"%";
+                                var wind=json['currently']['windSpeed'].toFixed(2)+" mph";
+                                var due=json['currently']['dewPoint'].toFixed(2);
+                                var humidity=((json['currently']['humidity'])*100).toFixed(0)+"%";
+                                var visibility=json['currently']['visibility'].toFixed(2)+" mi";
+                                var sunrise=new Date((json['daily']['data'][0]['sunriseTime'])*1000);
+                                var hr=sunrise.getHours()>12?(sunrise.getHours()-12):sunrise.getHours();
+                                var sr=('0'+hr).slice(-2)+":"+sunrise.getMinutes()+" "
+                                    +(sunrise.getHours()>12?"PM":"AM");
+                                var sunset=new Date((json['daily']['data'][0]['sunsetTime'])*1000);
+                                var hr=sunset.getHours()>12?(sunset.getHours()-12):sunset.getHours();
+                                var ss=('0'+hr).slice(-2)+":"+('0'+sunset.getMinutes()).slice(-2)+" "
+                                    +(sunset.getHours()>12?"PM":"AM");
+                                switch (pre)
+                                {
+                                    case 0: pre="None";break;
+                                    case 0.002: pre="Light";break;
+                                    case 0.017: pre="Very Light";break;
+                                    case 0.01: pre="Moderate";break;
+                                    case 0.04: pre="Heavy";break;
+                                }
+                                var image;
+                                switch (icon)
+                                {
+                                    case "clear-day": image="css/clear.png";break;
+                                    case "clear-night": image="css/clear_night.png";break;
+                                    case "rain": image="css/rain.png";break;
+                                    case "snow": image="css/snow.png";break;
+                                    case "sleet": image="css/sleet.png";break;
+                                    case "wind": image="css/clear.png";break;
+                                    case "fog": image="css/fog.png";break;
+                                    case "cloudy": image="css/cloudy.png";break;
+                                    case "partly-cloudy-day": image="css/cloud_day.png";break;
+                                    case "partly-cloudy-night": image="css/cloud_night.png";break;
+                                }
+                                console.log(image);
+                                //data for 24 Hours tab
+                                var time=new Array(24);
+                                var hm=new Array(24);
+                                var sum=new Array(24);
+                                var cloud=new Array(24);
+                                var temph=new Array(24);
+                                var windh=new Array(24);
+                                var humh=new Array(24);
+                                var visih=new Array(24);
+                                var preh=new Array(24);
+                                
+                                for(var i=0;i<24;i++){
+                                    time[i]=new Date((json['hourly']['data'][i]['time'])*1000);
+                                hm[i]=time[i].getHours()>12?(time[i].getHours()-12):time[i].getHours();
+                                hm[i]=('0'+hm[i]).slice(-2)+":"+('0'+time[i].getMinutes()).slice(-2)+" "
+                                    +(time[i].getHours()>12?"PM":"AM");
+                                    sum[i]=json['hourly']['data'][i]['icon'];
+                                    switch (sum[i])
+                                    {
+                                        case "clear-day": sum[i]="css/clear.png";break;
+                                        case "clear-night": sum[i]="css/clear_night.png";break;
+                                        case "rain": sum[i]="css/rain.png";break;
+                                        case "snow": sum[i]="css/snow.png";break;
+                                        case "sleet": sum[i]="css/sleet.png";break;
+                                        case "wind": sum[i]="css/clear.png";break;
+                                        case "fog": sum[i]="css/fog.png";break;
+                                        case "cloudy": sum[i]="css/cloudy.png";break;
+                                        case "partly-cloudy-day": sum[i]="css/cloud_day.png";break;
+                                        case "partly-cloudy-night": sum[i]="css/cloud_night.png";break;
+                                    }
+                                cloud[i]=((json['hourly']['data'][i]['cloudCover'])*100).toFixed(0)+"%";
+                                    temph[i]=json['hourly']['data'][i]['temperature'].toFixed(2);
+                                    windh[i]=json['hourly']['data'][i]['windSpeed'].toFixed(0)+"mph";
+                                humh[i]=((json['hourly']['data'][i]['humidity'])*100).toFixed(0)+"%";    
+                                    visih[i]=json['hourly']['data'][i]['visibility'].toFixed(2)+"mi";
+                                    preh[i]=json['hourly']['data'][i]['pressure'].toFixed(2)+"mb";
+                                }
+                                //data for Next 7 Days tab
+                                var timed=new Array(7);
+                                var day=new Array(7);
+                                var month=new Array(7);
+                                var date=new Array(7);
+                                var icond=new Array(7);
+                                var mintd=new Array(7);
+                                var maxtd=new Array(7);
+                                var sumd=new Array(7);
+                                var humd=new Array(7);
+                                var visid=new Array(7);
+                                var windd=new Array(7);
+                                var pred=new Array(7);
+                                var srd=new Array(7);
+                                var ssd=new Array(7);
+                var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                                for(var k1=1;k1<8;k1++){
+                                    timed[k1]=new Date(json['daily']['data'][k1]['time']*1000);
+                                    day[k1]=(timed[k1]).getDay();
+                                    switch(day[k1])
+                                    {
+                                        case 0: day[k1]="Sunday";break;
+                                        case 1: day[k1]="Monday";break;
+                                        case 2: day[k1]="Tuesday";break;
+                                        case 3: day[k1]="Wednsday";break;
+                                        case 4: day[k1]="Thursday";break;
+                                        case 5: day[k1]="Friday";break;
+                                        case 6: day[k1]="Saturday";break;
+                                    }
+                                    icond[k1]=json['daily']['data'][k1]['icon'];
+                                    switch (icond[k1])
+                                    {
+                                        case "clear-day": icond[k1]="css/clear.png";break;
+                                        case "clear-night": icond[k1]="css/clear_night.png";break;
+                                        case "rain": icond[k1]="css/rain.png";break;
+                                        case "snow": icond[k1]="css/snow.png";break;
+                                        case "sleet": icond[k1]="css/sleet.png";break;
+                                        case "wind": icond[k1]="css/clear.png";break;
+                                        case "fog": icond[k1]="css/fog.png";break;
+                                        case "cloudy": icond[k1]="css/cloudy.png";break;
+                                        case "partly-cloudy-day": icond[k1]="css/cloud_day.png";break;
+                                        case "partly-cloudy-night": icond[k1]="css/cloud_night.png";break;
+                                    }
+                                mintd[k1]=json['daily']['data'][k1]['temperatureMin'].toFixed(0)+"°";
+                                maxtd[k1]=json['daily']['data'][k1]['temperatureMax'].toFixed(0)+"°";
+                                    sumd[k1]=json['daily']['data'][k1]['summary'];
+                                    humd[k1]=(json['daily']['data'][k1]['humidity']*100).toFixed(0)+"%";
+                                if(json['daily']['data'][k1]['visibility'])
+                                    visid[k1]=json['daily']['data'][k1]['visibility'].toFixed(2)+" mi";
+                                else visid[k1]="N.A.";
+                                    windd[k1]=json['daily']['data'][k1]['windSpeed'].toFixed(2)+" mph";
+                                    pred[k1]=json['daily']['data'][k1]['pressure'].toFixed(2)+"mb";
+                            timed[k1]=new Date(json['daily']['data'][k1]['sunriseTime']*1000);
+                        srd[k1]=timed[k1].getHours()>12?(timed[k1].getHours()-12):timed[k1].getHours();
+                        srd[k1]=('0'+srd[k1]).slice(-2)+":"+('0'+timed[k1].getMinutes()).slice(-2)+" "
+                                    +(timed[k1].getHours()>12?"PM":"AM");
+                            timed[k1]=new Date(json['daily']['data'][k1]['sunsetTime']*1000);
+                        ssd[k1]=timed[k1].getHours()>12?(timed[k1].getHours()-12):timed[k1].getHours();
+                        ssd[k1]=('0'+ssd[k1]).slice(-2)+":"+('0'+timed[k1].getMinutes()).slice(-2)+" "
+                                    +(timed[k1].getHours()>12?"PM":"AM");
+                                timed[k1]=new Date(json['daily']['data'][k1]['time']*1000);
+                                month[k1]=months[timed[k1].getMonth()];
+                                date[k1]=timed[k1].getDate();
+                                }
+                                
+                                
+                                $('#now a').click(function (e) {
+                                  e.preventDefault()
+                                  $(this).tab('show')
+                                })
+                                $('#24hours a').click(function (e) {
+                                  e.preventDefault()
+                                  $(this).tab('show')
+                                })
+                                $('#week a').click(function (e) {
+                                  e.preventDefault()
+                                  $(this).tab('show')
+                                })
+                                $("div").remove(".tabs");
+                                $("body").append("<div class=\"tabs\"></div>");
+                                imgurl="http://www-scf.usc.edu/~wenxianz/HW8/"+image;
+                                des=json['currently']['summary']+" "+temp+tempu;
+                                $(".tabs").append("<ul class=\"nav nav-tabs\">\n<li><a href=\"#now\" data-toggle=\"tab\" id=\"mytab\">Right Now</a></li>\n<li><a href=\"#24hours\" data-toggle=\"tab\" id=\"mytab\">Next 24 Hours</a></li>\n<li><a href=\"#week\" data-toggle=\"tab\" id=\"mytab\">Next 7 Days</a></li>\n</ul>\n<div class=\"tab-content\">\n<div class=\"tab-pane fade in active\" id=\"now\"><div class=\"col-sm-6\" id=\"left\"><div class=\"col-sm-6\" id=\"wicon\"><img src=\""+image+"\" id=\"image\" width=150 height=150></div><div class=\"col-sm-6\" id=\"title\" height=170><p id=\"condition\"><b>"+condition+"</b></p><p id=\"num\"><b>"+temp+"</b><span id=\"unit\">"+tempu+"</p><div id=\"hlfb\"><p id=\"hl\"><span id=\"l\">L:"+ltemp+"</span> | <span id=\"h\">H:"+htemp+"</span></p><p id=\"fb\"><input type=\"image\" src=\"css/fb_icon.png\" width=30 onClick=\"facebook()\"></p></div></div><div class=\"col-sm-12\" id=\"table\"><table class=\"table table-striped\" id=\"mytable\"><tr><td>Precipitation</td><td>"+pre+"</td></tr><tr class=\"danger\"><td>Chance of Rain</td><td>"+rain+"</td></tr><tr><td>Wind Speed</td><td>"+wind+"</td></tr><tr class=\"danger\"><td>Dew Point</td><td>"+due+"</td></tr></tr><tr><td>Humidity</td><td>"+humidity+"</td></tr><tr class=\"danger\"><td>Visibility</td><td>"+visibility+"</td></tr></tr><tr><td>Sunrise</td><td>"+sr+"</td></tr><tr class=\"danger\"><td>Sunset</td><td>"+ss+"</td></tr></table></div></div><div class=\"col-sm-6\" id=\"right\"><div id=\"basicMap\"><script defer=\"defer\" type=\"text/javascript\">\n var map;var lat = "+json['latitude']+";\nvar lon = "+json['longitude']+";\nvar lonlat = new OpenLayers.LonLat(lon, lat);lonlat.transform(new OpenLayers.Projection(\"EPSG:4326\"),new OpenLayers.Projection(\"EPSG:900913\"));\nmap = new OpenLayers.Map(\"basicMap\");\nvar mapnik = new OpenLayers.Layer.OSM();\nvar layer_cloud = new OpenLayers.Layer.XYZ(\"clouds\",\"http://${s}.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png\",{isBaseLayer: false,opacity: 0.6,sphericalMercator: true});var layer_precipitation = new OpenLayers.Layer.XYZ(\"precipitation\",\"http://${s}.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png\",{isBaseLayer: false,opacity: 0.1,sphericalMercator: true});map.addLayers([mapnik, layer_precipitation, layer_cloud]);map.setCenter( lonlat, 10);$(\"#basicMap\").children('.olMapViewport').css(\"min-height\",\"475px\");<\/script></div></div></div>\n<div class=\"tab-pane\" id=\"24hours\"><table class=\"table\" id=\"mytableh\"><tr><th id=\"myth\">Time</th><th id=\"myth\">Summary</th><th id=\"myth\">Cloud Cover</th><th id=\"myth\">Temp(°F)</th><th id=\"myth\">View Details</th></tr></table></div>\n<div class=\"tab-pane\" id=\"week\"><div id=\"black\"><div class=\"col-md-1 col-md-offset-2\" id=\"weekmd"+"1"+"\" data-toggle=\"modal\" data-target=\"#myModal1\"><p id=\"day\">"+day[1]+"</p><p>"+month[1]+" "+date[1]+"</p><p id=\"temp\"><img src=\""+icond[1]+"\" width=50></p><p id=\"temp\">Min</p><p>Temp</p><p id=\"dtemp\"><b>"+mintd[1]+"</b></p><p id=\"temp\">Max</p><p>Temp</p><p id=\"dtemp\"><b>"+maxtd[1]+"</b></p></div></div></div>\n");
+                                
+                                for(var j=0;j<24;j++){
+                                    $("#mytableh").append("<tr><td>"+hm[j]+"</td><td><img src=\""+sum[j]+"\" width=40></td><td>"+cloud[j]+"</td><td>"+temph[j]+"</td><td id=\"plus\"><a role=\"button\" data-toggle=\"collapse\" href=\"#collapsediv"+j+"\" aria-expanded=\"false\" aria-controls=\"collapseExample\"><b>+</b></a></td></tr><tr><td colspan=5 id=\"collapsetd\"><div class=\"collapse\" id=\"collapsediv"+j+"\"><div class=\"well\" id=\"cwell\"><table class=\"table\" id=\"tablein\"><tr><td>Wind</td><td>Humidity</td><td>Visibility</td><td>Pressure</td></tr><tr id=\"insidetr\"><td>"+windh[j]+"</td><td>"+humh[j]+"</td><td>"+visih[j]+"</td><td>"+preh[j]+"</td></tr>");
+                                    }
+                                for(var k=2;k<8;k++){
+                                    $("#black").append("<div class=\"col-md-1\" id=\"weekmd"+k+"\" data-toggle=\"modal\" data-target=\"#myModal"+k+"\"><p id=\"day\">"+day[k]+"</p><p>"+month[k]+" "+date[k]+"</p><p id=\"temp\"><img src=\""+icond[k]+"\" width=50></p><p id=\"temp\">Min</p><p>Temp</p><p id=\"dtemp\"><b>"+mintd[k]+"</b></p><p id=\"temp\">Max</p><p>Temp</p><p id=\"dtemp\"><b>"+maxtd[k]+"</b></p></div>");
+                                }
+                                for(var k2=1;k2<8;k2++){
+                                $("#week").append("<div class=\"modal fade\" id=\"myModal"+k2+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"myModalLabel\"><div class=\"modal-dialog\" role=\"document\"><div class=\"modal-content\"><div class=\"modal-header\"><h4 class=\"modal-title\" id=\"myModalLabel\">Weather in "+$("#city")[0].value+", "+$("select option:selected").val()+"</h4></div><div class=\"modal-body\" id=\"mymodal\"><div class=\"col-lg-12\" id=\"modaltext\"><img src=\""+icond[k2]+"\" width=150></div><div class=\"col-lg-12\" id=\"modaltext\"><h3>"+day[k2]+": <span id=\"sumd\">"+sumd[k2]+"<span></h3></div><div class=\"col-lg-12\" id=\"modaltext\"><div class=\"col-md-4\" id=\"modaltext\"><h4>Sunrise Time</h4><p>"+srd[k2]+"</p></div><div class=\"col-md-4\" id=\"modaltext\"><h4>Sunset Time</h4><p>"+ssd[k2]+"</p></div><div class=\"col-md-4\" id=\"modaltext\"><h4>Humidity</h4><p>"+humd[k2]+"</p></div></div><div class=\"col-lg-12\"><div class=\"col-md-4\" id=\"modaltext\"><h4>Wind Speed</h4><p>"+windd[k2]+"</p></div><div class=\"col-md-4\" id=\"modaltext\"><h4>Visibility</h4><p>"+visid[k2]+"</p></div><div class=\"col-md-4\" id=\"modaltext\"><h4>Pressure</h4><p>"+pred[k2]+"</p></div></div></div><div class=\"modal-footer\"><button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button></div></div></div></div>");
+                                }
+                            },
+                            error: function(){ 
+                                alert("Can't get the JSON file from server.")}
+                        });        
+                }
+            });
+            
+            $("#clear").click(function(){
+                    $("#street")[0].value="";
+                    $("#city")[0].value="";
+                    $('select option:contains("Select your State...")').prop('selected',true);
+                    $("#f").prop("checked", true);
+                    $("#c").prop("checked", false);
+                    $("div").remove(".tabs");
+                    location.reload();
+                });
+  
+    })
+            
+           function facebook(){
+               
+             (function(d, s, id){
+                 var js, fjs = d.getElementsByTagName(s)[0];
+                 if (d.getElementById(id)) {return;}
+                 js = d.createElement(s); js.id = id;
+                 js.src = "//connect.facebook.net/en_US/sdk.js";
+                 fjs.parentNode.insertBefore(js, fjs);
+               }(document, 'script', 'facebook-jssdk')); 
+               
+            window.fbAsyncInit = function(picture) {
+            FB.init({
+              appId      : '945457175521847',
+              xfbml      : true,
+              version    : 'v2.5'
+            });
+             
+            FB.ui(
+                {
+                    method: 'feed',
+                    link: 'http://forecast.io',
+                    picture: imgurl,
+                    name: "Current Weather in "+$("#city")[0].value+", "+$("select option:selected").val(),
+                    caption: "WEATHER INFORMATION FROM FORECAST.IO",
+                    description: des
+                }, 
+
+                function(response){ 
+                    if (response && response.post_id){
+                        alert('Posted Successfully.');  }
+                    else {
+                        alert('Not posted.');  }
+            });
+          };
+     }   
+    </script>
+  </head>
+  <body>
+      <div id="fb-root"></div>
+      <div><p id="header">Forecast Search</p></div>
+      <div class="search">
+            <div>
+                <form class="form-inline" id="enter">
+                    <div class="form-group" id="box">
+                        <label class="control-label"><span class="first">Street Address:
+                        <span class="star">*</span></label>
+                        <input type="text" class="form-control input-sm" placeholder="Enter street address"
+                               size=28  name="street" id="street" value="">
+                    </div>
+                    <div class="form-group" id="box">
+                        <label class="control-label"><span class="first">City:
+                        <span class="star">*</span></label>
+                        <input type="text" class="form-control input-sm" placeholder="Enter the city name" 
+                               size=28  name="city" id="city" value="">
+                    </div>
+                    <div class="form-group" id="box">
+                        <label class="control-label"><span class="first">States:<span class="star">*</label>
+                        <select class="form-control input-sm" data-default-value="Select your State..."
+                                name="state" id="state">
+                            <option value="" SELECTED>Select your State...</option>
+                            <option value="AL">Alabama</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="CA">California</option>
+                            <option value="CO">Colorado</option>
+                            <option value="CT">Connecticut</option>
+                            <option value="DE">Delaware</option>        
+                            <option value="CD">District Of Columbia</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="HI">Hawaii</option>
+                            <option value="ID">Idaho</option>
+                            <option value="IL">Illinois</option>
+                            <option value="IN">Indiana</option>
+                            <option value="IA">Iowa</option>
+                            <option value="KS">Kansas</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="ME">Maine</option>
+                            <option value="MD">Maryland</option>
+                            <option value="MA">Massachusetts</option>
+                            <option value="MI">Michigan</option>
+                            <option value="MN">Minnesota</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="MO">Missouri</option>
+                            <option value="MT">Montana</option>
+                            <option value="NE">Nebraska</option>
+                            <option value="NV">Nevada</option>
+                            <option value="NH">New Hampshire</option>
+                            <option value="NJ">New Jersey</option>
+                            <option value="NM">New Mexico</option>
+                            <option value="NY">New York</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="ND">North Dakota</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="OR">Oregon</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="RI">Rhode Island</option>
+                            <option value="SC">South Carolina</option>
+                            <option value="SD">South Dakota</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="UT">Utah</option>
+                            <option value="VT">Vermont</option>
+                            <option value="VA">Virginia</option>
+                            <option value="WA">Washington</option>
+                            <option value="WV">West Virginia</option>
+                            <option value="WI">Wisconsin</option>
+                            <option value="WY">Wyoming</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="checkbox">
+                        <span class="first"><b>Degree:<span class="star">*<br>
+                        <input type="radio" name=degree id=f value="Fahrenheit" checked>
+                        <span class="first"> Fahrenheit</span>
+                        <input type="radio" name=degree id=c value="Celsius">
+                        <span class="first"> Celsius</span>
+                    </div>
+                    <div class="form-group" align="right" id="icon"><br>
+                        <button class="btn btn-primary" id="search">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
+                        <button class="btn btn-default" id="clear">
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Clear</button>
+                    </div>
+                </form>
+            </div>
+            <div id="api" align="right"><span class="first">
+                Powered by: </span><a href="http://forecast.io" class="logo"><img width=110 src="http://cs-server.usc.edu:45678/hw/hw8/images/forecast_logo.png" ></a>
+            </div>
+        </div>
+        <div class="line"><hr></div>
+        </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+<noscript>  
+</body>
+</html>

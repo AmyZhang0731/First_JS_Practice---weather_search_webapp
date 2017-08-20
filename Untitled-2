@@ -1,0 +1,39 @@
+rgb(249,124,126)
+ //Center  ( mercator coordinates )
+                                    var lat = json['latitude']; 
+                                    var lon = json['longitude']; 
+                                    console.log(lat);
+                                    console.log(lon);
+
+                                    var lonlat = new OpenLayers.LonLat(lon, lat);
+
+                                    map = new OpenLayers.Map("basicMap");
+
+                                    // Create overlays
+                                    // map layer OSM
+                                    var mapnik = new OpenLayers.Layer.OSM();
+
+                                    var layer_cloud = new OpenLayers.Layer.XYZ("clouds","http://${s}.tile.openweathermap.org/map/clouds/${z}/${x}/${y}.png",
+                                        {
+                                            isBaseLayer: false,
+                                            opacity: 0.7,
+                                            sphericalMercator: true
+                                        }
+                                    );
+
+                                    var layer_precipitation = new OpenLayers.Layer.XYZ("precipitation","http://${s}.tile.openweathermap.org/map/precipitation/${z}/${x}/${y}.png",
+                                        {
+                                            isBaseLayer: false,
+                                            opacity: 0.7,
+                                            sphericalMercator: true
+                                        }
+                                    );
+
+
+                                    map.addLayers([mapnik, layer_precipitation, layer_cloud]); 
+                                    map.setCenter( lonlat, 10 );
+                                    
+                                    
+                                    
+                                    
+          
